@@ -63,6 +63,7 @@ public class Main {
         System.out.println(spiderVsFly("G4", "H1"));
         System.out.println(spiderVsFly("E1", "D3"));
         System.out.println(spiderVsFly("E1", "C3"));
+        System.out.println(spiderVsFly("A2", "H3"));
     }
 
     static class point{
@@ -105,6 +106,7 @@ public class Main {
         arr[7] = new point("H", 7);
         int value1 = 0;
         int value2 = 0;
+        //парсим строку
         String letter1 = startCoord.substring(0,1);
         String letter2 = finishCoord.substring(0,1);
         for (point point : arr){
@@ -118,6 +120,7 @@ public class Main {
         int offset = Math.abs(value1 - value2);
         int pos1 = startCoord.charAt(1) - '0';
         int pos2 = finishCoord.charAt(1) - '0';
+        //если совпадают буквы(одна и та же ветка)
         if (letter1.equals(letter2)){
             if (pos1 >= pos2){
                 for (int i = pos1 - 1; i >= pos2; i--){
@@ -128,8 +131,8 @@ public class Main {
                     result += "-" + letter1 + i;
                 }
             }
-        }else if((pos1 == 0) || (pos2 == 0)){
-            if (pos1 == 0){
+        }else if((pos1 == 0) || (pos2 == 0)){ // ситуация когда одна из координат это центр
+            if (pos1 == 0){                   // т.е просто спуск или подъём по линии
                 pos1++;
                 while (pos1 <= pos2){
                     result += "-" + letter2 + pos1;
@@ -143,16 +146,17 @@ public class Main {
                 }
                 result += "-" + letter2 + pos2;
             }
+        //если смещение позволяет перемещаться по бокам (но множество всяких нюансов)
         }else if(offset <= 2){
             if ((pos1 >= pos2) && pos1!= 1) {
-                if ((offset == 1) && pos2 == 1){
+                if ((offset == 1) && pos2 == 1){ //тут мы идём не через центр а поворачиваем перед ним вбок
                     pos1--;
                     while(pos1 >= pos2){
                         result += "-" + letter1 + pos1;
                         pos1--;
                     }
                     return result + "-" + letter2 + pos2;
-                }else if(pos2 == 1){
+                }else if(pos2 == 1){ //тут уже смещение 2, значит через центр идти выгоднее
                     pos1--;
                     while(pos1 > 0){
                         result+= "-" + letter1 + pos1;
@@ -161,6 +165,7 @@ public class Main {
                     result += "-A0-" + letter2 + pos2;
                     return result;
                 }
+                //обработка этой ситуации по умолчанию (pos2 != 1)
                 pos1--;
                 while (pos1 >= pos2) {
                     result += "-" + letter1 + pos1;
@@ -177,15 +182,15 @@ public class Main {
                     }
                 }
                 result += "-" + letter2 + pos2;
-            } else{
-                if ((pos1 < 2) && offset != 1){
+            } else{ // ситуация обратная, уже pos1 < pos2
+                if ((pos1 < 2) && offset != 1){ //здесь смещение 2, идём через центр
                     result += "-A0";
-                }else if(pos1 < 2){
+                }else if(pos1 < 2){ // смещение точно 1 идём вбок
                     while (pos1 <= pos2){
                         result += "-" + letter2 + pos1;
                         pos1++;
                     }
-                }else{
+                }else{ //ситуация по умолчанию что pos1 != 1
                     for (point point : arr) {
                         double check = ((double) value1 + (double) value2) / 2;
                         if (check == point.getValue()) {
@@ -199,16 +204,17 @@ public class Main {
                     pos1++;
                 }
             }
+        //отдельная обработка с координатой A, по сути всё то же самое, просто с уникальными смещениями
         }else if((letter1.equals("A") || letter2.equals("A")) && offset >= 6) {
             if ((pos1 >= pos2) && pos1 != 1) {
-                if (offset == 6 && pos2 == 1){
+                if (offset == 6 && pos2 == 1){ // если у нас ветка G, то лучше идти через центр
                     while (pos1 > 0){
                         result += "-" + letter1 + pos1;
                         pos1--;
                     }
                     result += "-A0-" + letter2 + pos2;
                     return result;
-                }else if(pos2 == 1){
+                }else if(pos2 == 1){ // здесь точно ветка H, значит лучше повернуть
                     while (pos1 >= pos2){
                         result += "-" + letter1 + pos1;
                         pos1--;
@@ -216,6 +222,7 @@ public class Main {
                     result += "-" + letter2 + pos2;
                     return result;
                 }
+                //обработка по умолчанию
                 pos1--;
                 while (pos1 >= pos2) {
                     result += "-" + letter1 + pos1;
@@ -228,26 +235,38 @@ public class Main {
                     result += "-H" + pos1;
                 }
                 result += "-" + letter2 + pos1;
-            }else{
-                if (pos1 < 2 && offset != 7) {
+            }else{ // теперь pos1 < pos2
+                if (pos1 < 2 && offset != 7) { //идём через центр
                     result += "-A0";
                     while (pos1 <= pos2){
                         result += "-" + letter2 + pos1;
                         pos1++;
                     }
                     return result;
-                }else if (pos1 < 2){
+                }else if (pos1 < 2){ //идём вбок
                     while (pos1 <= pos2){
                         result += "-" + letter2 + pos1;
                         pos1++;
                     }
                     return result;
                 }
-                while (pos1 <= pos2){
-                    result += "-" + letter2 + pos1;
-                    pos1++;
+                //обработка по умолчанию
+                if (offset == 6){
+                    result+= "-H" + pos1;
+                    while (pos1 <= pos2){
+                        result += "-" + letter2 + pos1;
+                        pos1++;
+                    }
+                }else{
+                    if (offset == 7){
+                        while (pos1 <= pos2){
+                            result += "-" + letter2 + pos1;
+                            pos1++;
+                        }
+                    }
                 }
             }
+        //тупой проход через центр если смещение слишком велико
         }else {
             pos1--;
             while (pos1 > 0){
