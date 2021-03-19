@@ -55,11 +55,14 @@ public class Main {
         System.out.println(spiderVsFly("H3", "E2"));
         System.out.println(spiderVsFly("A4", "B2"));
         System.out.println(spiderVsFly("A4", "C2"));
-        System.out.println(spiderVsFly("A4", "G2"));
-        System.out.println(spiderVsFly("A1", "G4"));
-        System.out.println(spiderVsFly("F2", "H4"));
-        System.out.println(spiderVsFly("G3", "A4"));
-        System.out.println(spiderVsFly("A2", "G3"));
+        System.out.println(spiderVsFly("A4", "E2"));
+        System.out.println(spiderVsFly("A1", "G1"));
+        System.out.println(spiderVsFly("F2", "H2"));
+        System.out.println(spiderVsFly("A1", "H2"));
+        System.out.println(spiderVsFly("A1", "G2"));
+        System.out.println(spiderVsFly("G4", "H1"));
+        System.out.println(spiderVsFly("E1", "D3"));
+        System.out.println(spiderVsFly("E1", "C3"));
     }
 
     static class point{
@@ -125,8 +128,39 @@ public class Main {
                     result += "-" + letter1 + i;
                 }
             }
+        }else if((pos1 == 0) || (pos2 == 0)){
+            if (pos1 == 0){
+                pos1++;
+                while (pos1 <= pos2){
+                    result += "-" + letter2 + pos1;
+                    pos1++;
+                }
+            }else{
+                pos1--;
+                while (pos1 > 0){
+                    result += "-" + letter1 + pos1;
+                    pos1--;
+                }
+                result += "-" + letter2 + pos2;
+            }
         }else if(offset <= 2){
-            if (pos1 >= pos2) {
+            if ((pos1 >= pos2) && pos1!= 1) {
+                if ((offset == 1) && pos2 == 1){
+                    pos1--;
+                    while(pos1 >= pos2){
+                        result += "-" + letter1 + pos1;
+                        pos1--;
+                    }
+                    return result + "-" + letter2 + pos2;
+                }else if(pos2 == 1){
+                    pos1--;
+                    while(pos1 > 0){
+                        result+= "-" + letter1 + pos1;
+                        pos1--;
+                    }
+                    result += "-A0-" + letter2 + pos2;
+                    return result;
+                }
                 pos1--;
                 while (pos1 >= pos2) {
                     result += "-" + letter1 + pos1;
@@ -143,15 +177,10 @@ public class Main {
                     }
                 }
                 result += "-" + letter2 + pos2;
-            }else{
-                if (pos1 < 2){
-                    pos1--;
-                    while (pos1 > 0){
-                        result += "-" + letter1 + pos1;
-                        pos1--;
-                    }
+            } else{
+                if ((pos1 < 2) && offset != 1){
                     result += "-A0";
-                    pos1++;
+                }else if(pos1 < 2){
                     while (pos1 <= pos2){
                         result += "-" + letter2 + pos1;
                         pos1++;
@@ -164,14 +193,29 @@ public class Main {
                             result += "-" + tempLetter + pos1;
                         }
                     }
-                    while (pos1 <= pos2){
-                        result += "-" + letter2 + pos1;
-                        pos1++;
-                    }
+                }
+                while (pos1 <= pos2){
+                    result += "-" + letter2 + pos1;
+                    pos1++;
                 }
             }
         }else if((letter1.equals("A") || letter2.equals("A")) && offset >= 6) {
-            if (pos1 >= pos2) {
+            if ((pos1 >= pos2) && pos1 != 1) {
+                if (offset == 6 && pos2 == 1){
+                    while (pos1 > 0){
+                        result += "-" + letter1 + pos1;
+                        pos1--;
+                    }
+                    result += "-A0-" + letter2 + pos2;
+                    return result;
+                }else if(pos2 == 1){
+                    while (pos1 >= pos2){
+                        result += "-" + letter1 + pos1;
+                        pos1--;
+                    }
+                    result += "-" + letter2 + pos2;
+                    return result;
+                }
                 pos1--;
                 while (pos1 >= pos2) {
                     result += "-" + letter1 + pos1;
@@ -185,29 +229,26 @@ public class Main {
                 }
                 result += "-" + letter2 + pos1;
             }else{
-                if (pos1 < 2) {
-                    pos1--;
-                    while (pos1 > 0){
-                        result += "-" + letter1 + pos1;
-                        pos1--;
-                    }
+                if (pos1 < 2 && offset != 7) {
                     result += "-A0";
+                    while (pos1 <= pos2){
+                        result += "-" + letter2 + pos1;
+                        pos1++;
+                    }
+                    return result;
+                }else if (pos1 < 2){
+                    while (pos1 <= pos2){
+                        result += "-" + letter2 + pos1;
+                        pos1++;
+                    }
+                    return result;
+                }
+                while (pos1 <= pos2){
+                    result += "-" + letter2 + pos1;
                     pos1++;
-                    while (pos1 <= pos2){
-                        result += "-" + letter2 + pos1;
-                        pos1++;
-                    }
-                }else{
-                    if (offset == 6){
-                        result += "-H" + pos1;
-                    }
-                    while (pos1 <= pos2){
-                        result += "-" + letter2 + pos1;
-                        pos1++;
-                    }
                 }
             }
-        }else if (offset > 2){
+        }else {
             pos1--;
             while (pos1 > 0){
                 result += "-" + letter1 + pos1;
