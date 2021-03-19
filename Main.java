@@ -64,60 +64,78 @@ public class Main {
         System.out.println(spiderVsFly("E1", "D3"));
         System.out.println(spiderVsFly("E1", "C3"));
         System.out.println(spiderVsFly("A2", "H3"));
+        System.out.println(spiderVsFly("B2", "D4"));
     }
 
-    static class point{
+    static class branch{
 
         private String letter;
-        private int value;
+        private int xCoord;
+        private int yCoord;
+
+        public branch(String letter, int xCoord, int yCoord) {
+            this.letter = letter;
+            this.xCoord = xCoord;
+            this.yCoord = yCoord;
+        }
 
         public String getLetter() {
             return letter;
-        }
-
-        public int getValue() {
-            return value;
         }
 
         public void setLetter(String letter) {
             this.letter = letter;
         }
 
-        public void setValue(int value) {
-            this.value = value;
+        public int getxCoord() {
+            return xCoord;
         }
 
-        public point(String letter, int value) {
-            this.letter = letter;
-            this.value = value;
+        public void setxCoord(int xCoord) {
+            this.xCoord = xCoord;
+        }
+
+        public int getyCoord() {
+            return yCoord;
+        }
+
+        public void setyCoord(int yCoord) {
+            this.yCoord = yCoord;
         }
     }
 
     public static String spiderVsFly(String startCoord, String finishCoord){
         String result = startCoord;
-        point[] arr = new point[8];
-        arr[0] = new point("A", 0);
-        arr[1] = new point("B", 1);
-        arr[2] = new point("C", 2);
-        arr[3] = new point("D", 3);
-        arr[4] = new point("E", 4);
-        arr[5] = new point("F", 5);
-        arr[6] = new point("G", 6);
-        arr[7] = new point("H", 7);
-        int value1 = 0;
-        int value2 = 0;
+        branch[] arr = new branch[8];
+        arr[0] = new branch("A", 0, 2);
+        arr[1] = new branch("B", 1, 1);
+        arr[2] = new branch("C", 2, 0);
+        arr[3] = new branch("D", 1, -1);
+        arr[4] = new branch("E", 0, -2);
+        arr[5] = new branch("F", -1, -1);
+        arr[6] = new branch("G", -2, 0);
+        arr[7] = new branch("H", -1, 1);
+        int xCoord1 = 0, yCoord1 = 0;
+        int xCoord2 = 0, yCoord2 = 0;
         //парсим строку
         String letter1 = startCoord.substring(0,1);
         String letter2 = finishCoord.substring(0,1);
-        for (point point : arr){
-            if (letter1.equals(point.getLetter())){
-                value1 = point.getValue();
+        for (branch branch : arr){
+            if (letter1.equals(branch.getLetter())){
+                xCoord1 = branch.getxCoord();
+                yCoord1 = branch.getyCoord();
             }
-            if (letter2.equals(point.getLetter())){
-                value2 = point.getValue();
+            if (letter2.equals(branch.getLetter())){
+                xCoord2 = branch.getxCoord();
+                yCoord2 = branch.getyCoord();
             }
         }
-        int offset = Math.abs(value1 - value2);
+        int offset = 0;
+        if (Math.abs(xCoord1 - xCoord2) >= Math.abs(yCoord1 - yCoord2)){
+            offset = Math.abs(xCoord1 - xCoord2);
+        }else{
+            offset = Math.abs(yCoord1 - yCoord2);
+        }
         int pos1 = startCoord.charAt(1) - '0';
         int pos2 = finishCoord.charAt(1) - '0';
         //если совпадают буквы(одна и та же ветка)
@@ -138,127 +156,85 @@ public class Main {
                     result += "-" + letter2 + pos1;
                     pos1++;
                 }
-            }else{
+            }else {
                 pos1--;
-                while (pos1 > 0){
+                while (pos1 > 0) {
                     result += "-" + letter1 + pos1;
                     pos1--;
                 }
                 result += "-" + letter2 + pos2;
             }
-        //если смещение позволяет перемещаться по бокам (но множество всяких нюансов)
+        //если смещение позволяет перемещаться по бокам
         }else if(offset <= 2){
-            if ((pos1 >= pos2) && pos1!= 1) {
-                if ((offset == 1) && pos2 == 1){ //тут мы идём не через центр а поворачиваем перед ним вбок
+            if (offset == 1){ //значит мы очень близко
+                if (pos1 >= pos2){ //спускаемся до pos2 и поворачиваем
                     pos1--;
-                    while(pos1 >= pos2){
-                        result += "-" + letter1 + pos1;
-                        pos1--;
-                    }
-                    return result + "-" + letter2 + pos2;
-                }else if(pos2 == 1){ //тут уже смещение 2, значит через центр идти выгоднее
-                    pos1--;
-                    while(pos1 > 0){
-                        result+= "-" + letter1 + pos1;
-                        pos1--;
-                    }
-                    result += "-A0-" + letter2 + pos2;
-                    return result;
-                }
-                //обработка этой ситуации по умолчанию (pos2 != 1)
-                pos1--;
-                while (pos1 >= pos2) {
-                    result += "-" + letter1 + pos1;
-                    if (pos1 == pos2) {
-                        break;
-                    }
-                    pos1--;
-                }
-                for (point point : arr) {
-                    double check = ((double) value1 + (double) value2) / 2;
-                    if (check == point.getValue()) {
-                        String tempLetter = point.getLetter();
-                        result += "-" + tempLetter + pos2;
-                    }
-                }
-                result += "-" + letter2 + pos2;
-            } else{ // ситуация обратная, уже pos1 < pos2
-                if ((pos1 < 2) && offset != 1){ //здесь смещение 2, идём через центр
-                    result += "-A0";
-                }else if(pos1 < 2){ // смещение точно 1 идём вбок
-                    while (pos1 <= pos2){
-                        result += "-" + letter2 + pos1;
-                        pos1++;
-                    }
-                }else{ //ситуация по умолчанию что pos1 != 1
-                    for (point point : arr) {
-                        double check = ((double) value1 + (double) value2) / 2;
-                        if (check == point.getValue()) {
-                            String tempLetter = point.getLetter();
-                            result += "-" + tempLetter + pos1;
-                        }
-                    }
-                }
-                while (pos1 <= pos2){
-                    result += "-" + letter2 + pos1;
-                    pos1++;
-                }
-            }
-        //отдельная обработка с координатой A, по сути всё то же самое, просто с уникальными смещениями
-        }else if((letter1.equals("A") || letter2.equals("A")) && offset >= 6) {
-            if ((pos1 >= pos2) && pos1 != 1) {
-                if (offset == 6 && pos2 == 1){ // если у нас ветка G, то лучше идти через центр
-                    while (pos1 > 0){
-                        result += "-" + letter1 + pos1;
-                        pos1--;
-                    }
-                    result += "-A0-" + letter2 + pos2;
-                    return result;
-                }else if(pos2 == 1){ // здесь точно ветка H, значит лучше повернуть
                     while (pos1 >= pos2){
                         result += "-" + letter1 + pos1;
                         pos1--;
                     }
                     result += "-" + letter2 + pos2;
-                    return result;
-                }
-                //обработка по умолчанию
-                pos1--;
-                while (pos1 >= pos2) {
-                    result += "-" + letter1 + pos1;
-                    if (pos1 == pos2) {
-                        break;
-                    }
-                    pos1--;
-                }
-                if (offset == 6) {
-                    result += "-H" + pos1;
-                }
-                result += "-" + letter2 + pos1;
-            }else{ // теперь pos1 < pos2
-                if (pos1 < 2 && offset != 7) { //идём через центр
-                    result += "-A0";
+                }else{ //поворачиваем и поднимаемся
                     while (pos1 <= pos2){
                         result += "-" + letter2 + pos1;
                         pos1++;
                     }
-                    return result;
-                }else if (pos1 < 2){ //идём вбок
-                    while (pos1 <= pos2){
-                        result += "-" + letter2 + pos1;
-                        pos1++;
-                    }
-                    return result;
                 }
-                //обработка по умолчанию
-                if (offset == 6){
-                    result+= "-H" + pos1;
-                    while (pos1 <= pos2){
-                        result += "-" + letter2 + pos1;
-                        pos1++;
+            }else{ //смещение точно 2
+                if (pos1 >= pos2){
+                    if (pos2 == 1){ // идём через центр
+                        pos1--;
+                        while (pos1 > 0){
+                            result += "-" + letter1 + pos1;
+                            pos1--;
+                        }
+                        result += "-A0-" + letter2 + pos2;
+                    }else{ //спускаемся до pos2 и два раза поворачиваем
+                        pos1--;
+                        while (pos1 >= pos2){
+                            result += "-" + letter1 + pos1;
+                            pos1--;
+                        }
+                        for (branch branch : arr){ //поиск ветки, которая между
+                            if(xCoord1 == 0 || yCoord1 == 0 || xCoord2 == 0 || yCoord2 == 0){ //если это узловые ветки
+                                if ((branch.getxCoord() == ((xCoord1 + xCoord2) / 2)) &&
+                                        (branch.getyCoord() == ((yCoord1 + yCoord2) / 2))){
+                                    result += "-" + branch.getLetter() + pos2;
+                                    break;
+                                }
+                            }else{ //если диагональные ветки
+                                if ((branch.getxCoord() == (xCoord1 + xCoord2)) &&
+                                        (branch.getyCoord() == (yCoord1 + yCoord2))){
+                                    result += "-" + branch.getLetter() + pos2;
+                                    break;
+                                }
+                            }
+                        }
+                        result += "-" + letter2 + pos2;
                     }
                 }else{
-                    if (offset == 7){
+                    if (pos1 == 1){ //спускаемся и поднимаемся по 2-ой ветке
+                        result += "-A0";
+                        while (pos1 <= pos2){
+                            result += "-" + letter2 + pos1;
+                            pos1++;
+                        }
+                    }else{ //2 раза поворачиваем и поднимаемся по 2-ой ветке
+                        for (branch branch : arr){
+                            if(xCoord1 == 0 || yCoord1 == 0 || xCoord2 == 0 || yCoord2 == 0){ //если узловые ветки
+                                if ((branch.getxCoord() == ((xCoord1 + xCoord2) / 2)) &&
+                                        (branch.getyCoord() == ((yCoord1 + yCoord2) / 2))){
+                                    result += "-" + branch.getLetter() + pos1;
+                                    break;
+                                }
+                            }else{ //если диагональные ветки
+                                if ((branch.getxCoord() == (xCoord1 + xCoord2)) &&
+                                        (branch.getyCoord() == (yCoord1 + yCoord2))){
+                                    result += "-" + branch.getLetter() + pos1;
+                                    break;
+                                }
+                            }
+                        }
                         while (pos1 <= pos2){
                             result += "-" + letter2 + pos1;
                             pos1++;
@@ -266,7 +242,7 @@ public class Main {
                     }
                 }
             }
-        //тупой проход через центр если смещение слишком велико
+            //тупой проход через центр если смещение слишком велико
         }else {
             pos1--;
             while (pos1 > 0){
