@@ -117,8 +117,7 @@ public class Main {
         arr[7] = new branch("H", -1, 1);
         int xCoord1 = 0, yCoord1 = 0;
         int xCoord2 = 0, yCoord2 = 0;
-        //парсим строку
-        String letter1 = startCoord.substring(0,1);
+        String letter1 = startCoord.substring(0,1); //парсим строки
         String letter2 = finishCoord.substring(0,1);
         for (branch branch : arr){
             if (letter1.equals(branch.getLetter())){
@@ -138,8 +137,7 @@ public class Main {
         }
         int pos1 = startCoord.charAt(1) - '0';
         int pos2 = finishCoord.charAt(1) - '0';
-        //если совпадают буквы(одна и та же ветка)
-        if (letter1.equals(letter2)){
+        if (letter1.equals(letter2)){ //если совпадают буквы(одна и та же ветка)
             if (pos1 >= pos2){
                 for (int i = pos1 - 1; i >= pos2; i--){
                     result += "-" + letter1 + i;
@@ -164,8 +162,7 @@ public class Main {
                 }
                 result += "-" + letter2 + pos2;
             }
-        //если смещение позволяет перемещаться по бокам
-        }else if(offset <= 2){
+        }else if(offset <= 2){ //если смещение позволяет перемещаться по бокам
             if (offset == 1){ //значит мы очень близко
                 if (pos1 >= pos2){ //спускаемся до pos2 и поворачиваем
                     pos1--;
@@ -215,10 +212,6 @@ public class Main {
                 }else{
                     if (pos1 == 1){ //спускаемся и поднимаемся по 2-ой ветке
                         result += "-A0";
-                        while (pos1 <= pos2){
-                            result += "-" + letter2 + pos1;
-                            pos1++;
-                        }
                     }else{ //2 раза поворачиваем и поднимаемся по 2-ой ветке
                         for (branch branch : arr){
                             if(xCoord1 == 0 || yCoord1 == 0 || xCoord2 == 0 || yCoord2 == 0){ //если узловые ветки
@@ -235,15 +228,14 @@ public class Main {
                                 }
                             }
                         }
-                        while (pos1 <= pos2){
-                            result += "-" + letter2 + pos1;
-                            pos1++;
-                        }
+                    }
+                    while (pos1 <= pos2) {
+                        result += "-" + letter2 + pos1;
+                        pos1++;
                     }
                 }
             }
-            //тупой проход через центр если смещение слишком велико
-        }else {
+        }else { //тупой проход через центр если смещение слишком велико
             pos1--;
             while (pos1 > 0){
                 result += "-" + letter1 + pos1;
