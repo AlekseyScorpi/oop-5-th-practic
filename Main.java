@@ -65,6 +65,8 @@ public class Main {
         System.out.println(spiderVsFly("E1", "C3"));
         System.out.println(spiderVsFly("A2", "H3"));
         System.out.println(spiderVsFly("B2", "D4"));
+        System.out.println(spiderVsFly("B4", "F2"));
+        System.out.println(spiderVsFly("H3", "D4"));
     }
 
     static class branch{
@@ -132,8 +134,11 @@ public class Main {
         int offset = 0;
         if (Math.abs(xCoord1 - xCoord2) >= Math.abs(yCoord1 - yCoord2)){
             offset = Math.abs(xCoord1 - xCoord2);
-        }else{
+        }else {
             offset = Math.abs(yCoord1 - yCoord2);
+        }
+        if (((xCoord1 + xCoord2) == 0) && ((yCoord1 + yCoord2) == 0)){
+            offset = 4;
         }
         int pos1 = startCoord.charAt(1) - '0';
         int pos2 = finishCoord.charAt(1) - '0';
